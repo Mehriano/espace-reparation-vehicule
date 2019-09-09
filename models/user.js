@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  fax: {
+    type: String
+  },
   email: {
     type: String,
     required: true,
@@ -46,7 +49,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: ["Administrateur", "Responsable", "Client", "None"]
-  }
+  },
+  adresse: {
+    ville: {
+      type: String
+    },
+    zone: {
+      type: String
+    },
+    rue: {
+      type: String
+    },
+    codePostal: {
+      type: String
+    }
+  },
+  voitures: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vehicule" }]
 });
 
 userSchema.methods.generateAuthToken = function() {
@@ -64,7 +82,19 @@ userSchema.methods.generateAuthToken = function() {
 const User = mongoose.model("User", userSchema);
 
 function validateUser(user) {
-  const schema = {
+  const adresseSchema = Joi.object().keys({
+    ville: Joi.string()
+      .min(3)
+      .max(30),
+    zone: Joi.string()
+      .min(3)
+      .max(30),
+    rue: Joi.string()
+      .min(3)
+      .max(30),
+    codePostal: Joi.string()
+  });
+  const schema = Joi.object({
     nom: Joi.string()
       .min(5)
       .max(50)
@@ -78,9 +108,12 @@ function validateUser(user) {
       .max(50)
       .required(),
     cin: Joi.string()
-      .regex(/^\d+$/)
+      .regex(/^[0-9]{8}$/)
       .required(), // To Do Number must be at least 8 characters + concidering changing from int to string
     phone: Joi.string()
+      .regex(/^[0-9]{8}$/)
+      .required(), //  To Do regex  to form a valid phoneNumber
+    fax: Joi.string()
       .regex(/^[0-9]{8}$/)
       .required(), //  To Do regex  to form a valid phoneNumber
     email: Joi.string()
@@ -94,8 +127,10 @@ function validateUser(user) {
       .required(),
     role: Joi.string()
       .valid("Administrateur", "Responsable", "Client", "None")
-      .required()
-  };
+      .required(),
+    //  voitures: Joi.array().items(Joi.ObjectId),
+    adresse: adresseSchema
+  });
 
   return Joi.validate(user, schema);
 }
