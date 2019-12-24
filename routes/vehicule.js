@@ -3,9 +3,14 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
+const { User } = require("../models/user");
 
 router.get("/", async (req, res) => {
   const vehicule = await Vehicule.find();
+  res.send(vehicule);
+});
+router.get("/userid/:id", async (req, res) => {
+  const vehicule = await Vehicule.find({ "proprietaire._id": req.params.id });
   res.send(vehicule);
 });
 router.get("/proprietaire/:nom", async (req, res) => {
@@ -17,12 +22,22 @@ router.get("/proprietaire/:nom", async (req, res) => {
 router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+  const prop = await User.findById(req.body.proprietaire);
+  if (!prop) return res.status(404).send("can't find this user!!!");
 
   const vehicule = new Vehicule({
-    nom: req.body.nom
+    dMC: req.body.dMC,
+    energie: req.body.energie,
+    immatriculation: req.body.immatriculation,
+    kilometrage: req.body.kilometrage,
+    marque: req.body.marque,
+    modele: req.body.modele,
+    numChasis: req.body.numChasis,
+    sizeMoteur: req.body.sizeMoteur,
+    proprietaire: prop
   });
   try {
-    await Vehicule.save();
+    await vehicule.save();
 
     res.send(vehicule);
   } catch (err) {

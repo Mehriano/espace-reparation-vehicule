@@ -1,2 +1,23 @@
 ### GET ALL VEHICULES
-POST http://localhost:3000/api/vehicules
+
+
+POST http://localhost:3000/api/etats  HTTP/1.1
+content-type: application/json
+
+{
+    "description": "réparation est terminé",
+    "order": 6
+}
+
+ "en attente de confirmation",
+        "en cours de diagnostique",
+        "en attente approvisionnemt commande",
+        "en cours de reparation",
+        "Done",
+        "annulé"
+###
+DELETE http://localhost:3000/api/etats/5dfdeda5b1622612d83c969f
+
+
+#####
+GET  http://localhost:3000/api/etats

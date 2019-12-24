@@ -2,7 +2,7 @@ const Joi = require("joi");
 const { usershema } = require("./user");
 const mongoose = require("mongoose");
 const vehiculeSchema = new mongoose.Schema({
-  immatricularion: {
+  immatriculation: {
     type: String,
     required: true,
     minlength: 5,
@@ -45,7 +45,7 @@ const Vehicule = mongoose.model("Vehicule", vehiculeSchema);
 
 function validateVehicule(vehicule) {
   const schema = {
-    immatricularion: Joi.string()
+    immatriculation: Joi.string()
       .min(5)
       .max(50)
       .regex(/^[0-9]+[A-z a-z]+[0-9]+$/)

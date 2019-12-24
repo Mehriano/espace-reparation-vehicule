@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
-const { pieceRechangeSchema } = require("./pieceRechange");
+const { etatSchema } = require("./etat");
 const eventRepSchema = new mongoose.Schema({
   vehicule: {
     type: mongoose.Schema.Types.ObjectId,
@@ -10,56 +10,56 @@ const eventRepSchema = new mongoose.Schema({
     type: Number
   },
   etat: {
-    type: String,
-    required: true,
-    enum: ["en attente de confirmation",
-    "en cours de diagnostique",
-    "en attente approvisionnemt commande",
-    "en cours de reparation",
-    "Done",
-    "annulé"] // TO ADJUST LATER
+    type: etatSchema,
+    required: true
   },
   pieces: [
     {
-      type: [pieceRechangeSchema]
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "pieceRechangeSchema"
+      },
+      dureeComande: {
+        type: Date
+      }
     }
   ],
   observation: {
     type: String,
     required: true
   },
-  travauxDemande: {
+  travailDemande: {
     type: String,
     required: true
   },
-  delaiLiv: {
+  start: {
     type: Date,
     required: true
+  }, 
+  seenClient:{
+    type: Boolean
   },
-  dateRep: {
+  seenResp:{
+    type: Boolean
+  },
+  issuedAt: {
     type: Date
   }
+
 });
 const EventRep = mongoose.model("EventRep", eventRepSchema);
 function validateEventRep(eventRep) {
   const Schema = {
-    vehicule: Joi.objectId(),
-    prix: Joi.number().required(),
-    etat: Joi.string()
-      .valid([
-        "en attente de confirmation",
-        "en cours de diagnostique",
-        "en attente approvisionnemt commande",
-        "en cours de reparation",
-        "Done",
-        "annulé"
-      ])
-      .required(),
+    vehiculeId: Joi.objectId(),
+    prix: Joi.number(),
+    etat: Joi.number().required(),
     pieces: Joi.array(),
     observation: Joi.string().required(),
     travailDemande: Joi.string().required(),
-    delaiLiv: Joi.date().required(),
-    delaiRep: Joi.date()
+    start: Joi.date().required(),
+    seenClient: Joi.boolean(),
+    seenResp: Joi.boolean(),
+    issuedAt: Joi.date()
   };
   return Joi.validate(eventRep, Schema);
 }
